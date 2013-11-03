@@ -30,7 +30,7 @@ UninstPage instfiles
 Section "Toastify (required)"
   SectionIn RO
   
-  ;!insertmacro CheckDotNET ${DOTNET_VERSION}
+  !insertmacro CheckDotNET ${DOTNET_VERSION}
   
   ; Set output path to the installation directory.
   SetOutPath $INSTDIR
