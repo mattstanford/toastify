@@ -42,6 +42,7 @@ Section "Toastify (required)"
   File "Resources\ManagedWinapiNativeHelper.dll"
   File "WPFToolkit.dll"
   File "LICENSE"
+  File "Newtonsoft.Json.dll"
   
   ; Write the uninstall keys for Windows
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Toastify" "DisplayName" "Toastify"
@@ -89,6 +90,7 @@ Section "Uninstall"
   Delete "$INSTDIR\ManagedWinapiNativeHelper.dll"
   Delete "$INSTDIR\WPFToolkit.dll"
   Delete "$INSTDIR\LICENSE"
+  Delete "$INSTDIR\Newtonsoft.Json.dll"
   
   ; remove the settings directory
   Delete "$APPDATA\Toastify.xml"
