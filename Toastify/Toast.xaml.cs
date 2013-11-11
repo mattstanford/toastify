@@ -166,22 +166,20 @@ namespace Toastify
                 }
 
                 try
-                {
-                    
-                    System.Diagnostics.Debug.WriteLine("http://ws.audioscrobbler.com/2.0/?method=track.getinfo&api_key=b25b959554ed76058ac220b7b2e0a026&artist=" + part1 + "&track=" + part2);
-                    XPathDocument doc = new XPathDocument("http://ws.audioscrobbler.com/2.0/?method=track.getinfo&api_key=b25b959554ed76058ac220b7b2e0a026&artist=" + part1 + "&track=" + part2);
+                {                    
+                    //Use the iTunes API to get the cover art
+                    String url = "https://itunes.apple.com/search?term=" + part2 + "&attribute=songTerm&entity=album";
+                    var json = new WebClient().DownloadString(url);
 
-                    XPathNavigator navigator = doc.CreateNavigator();
-                    XPathNodeIterator nodeImage = navigator.Select("/lfm/track/album/image[@size='medium']");
+                    iTunesResult deserializedJson = JsonConvert.DeserializeObject<iTunesResult>(json);
 
-                    if (nodeImage.MoveNext())
-                    {
-                        XPathNavigator node = nodeImage.Current;
-                        coverUrl = node.InnerXml;
-                    }
-                    else
-                        coverUrl = "SpotifyToastifyLogo.png";
-                    
+                    //Filter tracks by artist
+                    List<iTunesTrack> resultsForArtist = getResultsForArtist(deserializedJson, part1);
+
+                    //Get the oldest track (filters out all the "best of" albums, etc.)
+                    iTunesTrack oldestTrack = getOldestTitle(resultsForArtist);
+
+                    coverUrl = oldestTrack.artworkUrl100;
 
 
                 }
