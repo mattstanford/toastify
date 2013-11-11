@@ -14,6 +14,7 @@ using System.IO;
 using System.Xml.XPath;
 using System.Xml;
 using System.Diagnostics;
+using Newtonsoft.Json;
 
 namespace Toastify
 {
@@ -166,6 +167,7 @@ namespace Toastify
 
                 try
                 {
+                    
                     System.Diagnostics.Debug.WriteLine("http://ws.audioscrobbler.com/2.0/?method=track.getinfo&api_key=b25b959554ed76058ac220b7b2e0a026&artist=" + part1 + "&track=" + part2);
                     XPathDocument doc = new XPathDocument("http://ws.audioscrobbler.com/2.0/?method=track.getinfo&api_key=b25b959554ed76058ac220b7b2e0a026&artist=" + part1 + "&track=" + part2);
 
@@ -179,6 +181,9 @@ namespace Toastify
                     }
                     else
                         coverUrl = "SpotifyToastifyLogo.png";
+                    
+
+
                 }
                 catch (Exception)
                 {
@@ -187,6 +192,41 @@ namespace Toastify
 
                 this.Dispatcher.Invoke((Action)delegate { FadeIn(); }, System.Windows.Threading.DispatcherPriority.Normal);
             }
+        }
+
+        private List<iTunesTrack> getResultsForArtist(iTunesResult data, String artist)
+        {
+            List<iTunesTrack> returnList = new List<iTunesTrack>();
+
+            foreach (iTunesTrack result in data.results)
+            {
+                if (result.artistName.Equals(artist))
+                {
+                    returnList.Add(result);
+                }
+            }
+
+            return returnList;
+        }
+
+        private iTunesTrack getOldestTitle(List<iTunesTrack> resultList)
+        {
+            iTunesTrack oldestTrack = null;
+            DateTime oldestTrackDate = DateTime.Now;
+
+            foreach (iTunesTrack result in resultList)
+            {
+                DateTime trackDate = Convert.ToDateTime(result.releaseDate);
+
+                if (DateTime.Compare(trackDate, oldestTrackDate) < 0)
+                {
+                    oldestTrackDate = trackDate;
+                    oldestTrack = result;
+                }
+            }
+
+            return oldestTrack;
+
         }
 
         private bool SplitTitle(string title, out string part1, out string part2)
@@ -561,5 +601,19 @@ namespace Toastify
             FadeOut();
             Spotify.SendAction(SpotifyAction.ShowSpotify);
         }
+    }
+
+    public class iTunesResult
+    {
+        public string resultCount { get; set; }
+        public iTunesTrack[] results { get; set; }
+    }
+
+    public class iTunesTrack
+    {
+        public String artworkUrl60 { get; set; }
+        public String artworkUrl100 { get; set; }
+        public String artistName { get; set; }
+        public String releaseDate { get; set; }
     }
 }
